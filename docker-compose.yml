@@ -1,0 +1,40 @@
+sentry:
+  build: sentry/
+  command: sentry --config=/etc/sentry.conf.py start
+  links:
+    - redis
+    - postgres
+  ports:
+    - "9000:9000"
+  volumes:
+    - /docker-data/sentry/:/data/
+  environment:
+    - SENTRY_CONF=/etc/sentry.conf.py
+redis:
+  image: redis
+  ports:
+    - "6379:6379"
+postgres:
+  image: postgres
+  environment:
+    - POSTGRES_PASSWORD=mysecretpassword
+worker:
+  build: sentry/
+  user: user
+  command: sentry celery worker
+  links:
+    - redis
+    - postgres
+  environment:
+    - CELERY_BROKER_URL=redis://redis
+    - SENTRY_CONF=/etc/sentry.conf.py
+beat:
+  build: sentry/
+  user: user
+  command: sentry celery beat
+  links:
+    - redis
+    - postgres
+  environment:
+    - CELERY_BROKER_URL=redis://redis
+    - SENTRY_CONF=/etc/sentry.conf.py
