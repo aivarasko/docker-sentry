@@ -10,6 +10,8 @@ sentry:
     - /docker-data/sentry/:/data/
   environment:
     - SENTRY_CONF=/etc/sentry.conf.py
+    - SENTRY_DOMAIN
+    - POSTGRES_PASSWORD
 redis:
   image: redis
   ports:
@@ -17,7 +19,7 @@ redis:
 postgres:
   image: postgres
   environment:
-    - POSTGRES_PASSWORD=mysecretpassword
+    - POSTGRES_PASSWORD
 worker:
   build: sentry/
   user: user
@@ -28,6 +30,7 @@ worker:
   environment:
     - CELERY_BROKER_URL=redis://redis
     - SENTRY_CONF=/etc/sentry.conf.py
+    - POSTGRES_PASSWORD
 beat:
   build: sentry/
   user: user
@@ -38,3 +41,4 @@ beat:
   environment:
     - CELERY_BROKER_URL=redis://redis
     - SENTRY_CONF=/etc/sentry.conf.py
+    - POSTGRES_PASSWORD

@@ -1,3 +1,7 @@
+# Set password
+export POSTGRES_PASSWORD="myscretpassword"
+export SENTRY_DOMAIN="http://sentry:9000"  # No trailing slash
+
 # Start Postgres instance
 docker-compose up -d postgres
 

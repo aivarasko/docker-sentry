@@ -3,6 +3,7 @@
 # you can inherit and tweak settings to your hearts content.
 from sentry.conf.server import *
 
+import os
 import os.path
 
 CONF_ROOT = os.path.dirname(__file__)
@@ -21,11 +22,13 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'sentry',
         'USER': 'postgres',
-        'PASSWORD': 'mysecretpassword',
+        'PASSWORD': os.environ['POSTGRES_PASSWORD'],
         'HOST': 'postgres',
         'PORT': '5432',
     }
 }
+
+print DATABASES
 
 # You should not change this setting after your database has been created
 # unless you have altered all schemas first
@@ -198,4 +201,6 @@ SECRET_KEY = 'n0kX3b9fYdVTm2O8EgnTqwpnSpPT0s7Pd2tW7HeD6MbAUWOxk+oqeg=='
 
 SENTRY_PUBLIC = True
 ALLOWED_HOSTS = ['*']
-# SENTRY_URL_PREFIX = 'http://sentry:9000'  # No trailing slash!
+
+if 'SENTRY_DOMAIN' in os.environ:
+    SENTRY_URL_PREFIX = os.environ['SENTRY_DOMAIN']
