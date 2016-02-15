@@ -1,5 +1,5 @@
 sentry:
-  build: sentry/
+  image: sentry:8-onbuild
   command: sentry --config=/etc/sentry.conf.py start
   links:
     - redis
@@ -9,9 +9,11 @@ sentry:
   volumes:
     - /docker-data/sentry/:/data/
   environment:
-    - SENTRY_CONF=/etc/sentry.conf.py
-    - SENTRY_DOMAIN
     - POSTGRES_PASSWORD
+    - SENTRY_SECRET_KEY
+    - SENTRY_EMAIL_HOST
+    - SENTRY_EMAIL_PORT
+    - SENTRY_SERVER_EMAIL
 redis:
   image: redis
   ports:
@@ -21,24 +23,22 @@ postgres:
   environment:
     - POSTGRES_PASSWORD
 worker:
-  build: sentry/
-  user: user
+  image: sentry:8-onbuild
   command: sentry celery worker
   links:
     - redis
     - postgres
   environment:
     - CELERY_BROKER_URL=redis://redis
-    - SENTRY_CONF=/etc/sentry.conf.py
     - POSTGRES_PASSWORD
+    - SENTRY_SECRET_KEY
 beat:
-  build: sentry/
-  user: user
+  image: sentry:8-onbuild
   command: sentry celery beat
   links:
     - redis
     - postgres
   environment:
     - CELERY_BROKER_URL=redis://redis
-    - SENTRY_CONF=/etc/sentry.conf.py
     - POSTGRES_PASSWORD
+    - SENTRY_SECRET_KEY
